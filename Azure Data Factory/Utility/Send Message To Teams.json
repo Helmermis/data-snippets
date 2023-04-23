@@ -1,0 +1,92 @@
+{
+	"name": "Send Teams Webhook",
+	"properties": {
+		"activities": [
+			{
+				"name": "Set JSON Schema",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "messageCard",
+					"value": "{\n    \"@type\": \"MessageCard\",\n    \"@context\": \"http://schema.org/extensions\",\n    \"themeColor\": \"0076D7\",\n    \"summary\": \"Pipeline status alert message​​​​\",\n    \"sections\": [\n        {\n            \"activityTitle\": \"Pipeline execution alert​​​​\",\n            \"facts\": [\n                {\n                    \"name\": \"Subscription Id:\",\n                    \"value\": \"@{pipeline().parameters.subscription}\"\n                },\n                {\n                    \"name\": \"Resource Group:\",\n                    \"value\": \"@{pipeline().parameters.resourceGroup}\"\n                },\n                {\n                    \"name\": \"Data Factory Name:\",\n                    \"value\": \"@{pipeline().DataFactory}\"\n                },\n                {\n                    \"name\": \"Pipeline RunId:\",\n                    \"value\": \"@{pipeline().parameters.runId}\"\n                },\n                {\n                    \"name\": \"Pipline Name:\",\n                    \"value\": \"@{pipeline().parameters.name}\"\n                },\n                {\n                    \"name\": \"Pipeline Status:\",\n                    \"value\": \"@{pipeline().parameters.status}\"\n                },\n                {\n                    \"name\": \"Execution Start Time (UTC):\",\n                    \"value\": \"@{pipeline().parameters.triggerTime}\"\n                },\n                {\n                    \"name\": \"Execution Finish Time (UTC):\",\n                    \"value\": \"@{pipeline().parameters.executionEndTime}\"\n                },\n                {\n                    \"name\": \"Execution Duration (s):\",\n                    \"value\": \"@{pipeline().parameters.runDuration}\"\n                },\n                {\n                    \"name\": \"Message:\",\n                    \"value\": \"@{pipeline().parameters.message}\"\n                },\n                {\n                    \"name\": \"Notification Time (UTC):\",\n                    \"value\": \"@{utcnow()}\"\n                }\n            ],\n            \"markdown\": true\n        }\n    ],\n    \"potentialAction\": [\n        {\n            \"@type\": \"OpenUri\",\n            \"name\": \"View pipeline run\",\n            \"targets\": [\n                {\n                    \"os\": \"default\",\n                    \"uri\": \"@{concat('https://adf.azure.com/monitoring/pipelineruns/',pipeline().parameters.runId,'?factory=/subscriptions/',pipeline().parameters.subscription,'/resourceGroups/',pipeline().parameters.resourceGroup,'/providers/Microsoft.DataFactory/factories/',pipeline().DataFactory)}\"\n                }\n            ]\n        }\n    ]\n}"
+				}
+			},
+			{
+				"name": "Send teams Webhook",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Set JSON Schema",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@pipeline().parameters.teamWebhookUrl",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"body": {
+						"value": "@variables('messageCard')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"runId": {
+				"type": "string"
+			},
+			"name": {
+				"type": "string"
+			},
+			"triggerTime": {
+				"type": "string"
+			},
+			"status": {
+				"type": "string"
+			},
+			"message": {
+				"type": "string"
+			},
+			"executionEndTime": {
+				"type": "string"
+			},
+			"RunDuration": {
+				"type": "string"
+			},
+			"teamWebhookUrl": {
+				"type": "string",
+				"defaultValue": "[INSERT TEAMS WEBHOOK]"
+			},
+			"subscription": {
+				"type": "string"
+			},
+			"resourceGroup": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"messageCard": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Utility/Webhook"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-03-08T15:30:05Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
