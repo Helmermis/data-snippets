@@ -1,0 +1,36 @@
+{
+  "name": "Pastel Theme",
+  "dataColors": [
+    "#A6A0B2",
+    "#FFD0CA",
+    "#FFF9D1",
+    "#AECCB3",
+    "#9CB0B2",
+    "#BDE3F2",
+    "#F2E0DC"
+  ],
+  "visualStyles": {
+    "*": {
+      "*": {
+        "border": [
+          {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            },
+            "radius": 15,
+            "show": true
+          }
+        ]
+      }
+    }
+  }
+}
